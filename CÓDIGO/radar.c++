@@ -1,9 +1,17 @@
-import processing.serial.*; // imports library for serial communication
-import java.awt.event.KeyEvent; // imports library for reading the data from the serial port
+/*   Arduino Radar Project
+ *  
+ *  by Dejan Nedelkovski, 
+ *  www.HowToMechatronics.com
+ *  Tradução: PontoMakers
+ *
+ */
+
+import processing.serial.*; // importa biblioteca para comunicação serial
+import java.awt.event.KeyEvent; // biblioteca de importações para ler os dados da porta serial
 import java.io.IOException;
 
-Serial myPort; // defines Object Serial
-// defubes variables
+Serial myPort; 
+// variáveis
 String angle="";
 String distance="";
 String data="";
@@ -16,11 +24,11 @@ PFont orcFont;
 
 void setup() {
   
- size (1920, 1080); // ***CHANGE THIS TO YOUR SCREEN RESOLUTION***
+ size (1366, 768); // ***MUDE ISTO PARA SUA RESOLUÇÃO DE TELA***
  smooth();
- myPort = new Serial(this,"COM4", 9600); // starts the serial communication
- myPort.bufferUntil('.'); // reads the data from the serial port up to the character '.'. So actually it reads this: angle,distance.
- orcFont = loadFont("OCRAExtended-30.vlw");
+ myPort = new Serial(this,"COM7", 9600); // inicia a comunicação serial
+ myPort.bufferUntil('.'); // lê os dados da porta serial até o caractere '.' Então, na verdade, lê isto: ângulo, distância.
+ orcFont = loadFont("ArialMT-30.vlw");
 }
 
 void draw() {
@@ -32,22 +40,22 @@ void draw() {
   fill(0,4); 
   rect(0, 0, width, height-height*0.065); 
   
-  fill(98,245,31); // green color
-  // calls the functions for drawing the radar
+  fill(98,245,31); // cor verde
+  // chama as funções para desenhar o radar
   drawRadar(); 
   drawLine();
   drawObject();
   drawText();
 }
 
-void serialEvent (Serial myPort) { // starts reading data from the Serial Port
-  // reads the data from the Serial Port up to the character '.' and puts it into the String variable "data".
+void serialEvent (Serial myPort) { // começa a ler dados da porta serial
+  // lê os dados da porta serial até o caractere '.' e coloca na variável String "data".
   data = myPort.readStringUntil('.');
   data = data.substring(0,data.length()-1);
   
-  index1 = data.indexOf(","); // find the character ',' and puts it into the variable "index1"
-  angle= data.substring(0, index1); // read the data from position "0" to position of the variable index1 or thats the value of the angle the Arduino Board sent into the Serial Port
-  distance= data.substring(index1+1, data.length()); // read the data from position "index1" to the end of the data pr thats the value of the distance
+  index1 = data.indexOf(","); // encontre o caractere ',' e coloque-o na variável "index1"
+  angle= data.substring(0, index1); // leia os dados da posição "0" para a posição da variável index1 ou seja o valor do ângulo que a placa Arduino enviou para a porta serial
+  distance= data.substring(index1+1, data.length()); // ler os dados da posição "index1" para o final dos dados pr thats o valor da distância
   
   // converts the String variables into Integer
   iAngle = int(angle);
@@ -56,16 +64,16 @@ void serialEvent (Serial myPort) { // starts reading data from the Serial Port
 
 void drawRadar() {
   pushMatrix();
-  translate(width/2,height-height*0.074); // moves the starting coordinats to new location
+  translate(width/2,height-height*0.074); // move as coordenadas iniciais para o novo local
   noFill();
   strokeWeight(2);
   stroke(98,245,31);
-  // draws the arc lines
+  // desenha as linhas do arco
   arc(0,0,(width-width*0.0625),(width-width*0.0625),PI,TWO_PI);
   arc(0,0,(width-width*0.27),(width-width*0.27),PI,TWO_PI);
   arc(0,0,(width-width*0.479),(width-width*0.479),PI,TWO_PI);
   arc(0,0,(width-width*0.687),(width-width*0.687),PI,TWO_PI);
-  // draws the angle lines
+  // desenha as linhas angulares
   line(-width/2,0,width/2,0);
   line(0,0,(-width/2)*cos(radians(30)),(-width/2)*sin(radians(30)));
   line(0,0,(-width/2)*cos(radians(60)),(-width/2)*sin(radians(60)));
@@ -78,11 +86,11 @@ void drawRadar() {
 
 void drawObject() {
   pushMatrix();
-  translate(width/2,height-height*0.074); // moves the starting coordinats to new location
+  translate(width/2,height-height*0.074); // move as coordenadas iniciais para o novo local
   strokeWeight(9);
-  stroke(255,10,10); // red color
-  pixsDistance = iDistance*((height-height*0.1666)*0.025); // covers the distance from the sensor from cm to pixels
-  // limiting the range to 40 cms
+  stroke(255,10,10); // cor vermelha
+  pixsDistance = iDistance*((height-height*0.1666)*0.025); // cobre a distância do sensor de cm para pixels
+  // limitando o alcance a 40 cms
   if(iDistance<40){
     // draws the object according to the angle and the distance
   line(pixsDistance*cos(radians(iAngle)),-pixsDistance*sin(radians(iAngle)),(width-width*0.505)*cos(radians(iAngle)),-(width-width*0.505)*sin(radians(iAngle)));
@@ -94,19 +102,19 @@ void drawLine() {
   pushMatrix();
   strokeWeight(9);
   stroke(30,250,60);
-  translate(width/2,height-height*0.074); // moves the starting coordinats to new location
-  line(0,0,(height-height*0.12)*cos(radians(iAngle)),-(height-height*0.12)*sin(radians(iAngle))); // draws the line according to the angle
+  translate(width/2,height-height*0.074); // move as coordenadas iniciais para o novo local
+  line(0,0,(height-height*0.12)*cos(radians(iAngle)),-(height-height*0.12)*sin(radians(iAngle))); // desenha a linha de acordo com o ângulo
   popMatrix();
 }
 
-void drawText() { // draws the texts on the screen
+void drawText() { // desenha os textos na tela
   
   pushMatrix();
   if(iDistance>40) {
-  noObject = "Out of Range";
+  noObject = "Fora do Radar";
   }
   else {
-  noObject = "In Range";
+  noObject = "Objeto Detectado";
   }
   fill(0,0,0);
   noStroke();
@@ -119,9 +127,9 @@ void drawText() { // draws the texts on the screen
   text("30cm",width-width*0.177,height-height*0.0833);
   text("40cm",width-width*0.0729,height-height*0.0833);
   textSize(40);
-  text("Object: " + noObject, width-width*0.875, height-height*0.0277);
-  text("Angle: " + iAngle +" °", width-width*0.48, height-height*0.0277);
-  text("Distance: ", width-width*0.26, height-height*0.0277);
+  text("Objeto: " + noObject, width-width*0.875, height-height*0.0277);
+  text("Anglo: " + iAngle +" °", width-width*0.48, height-height*0.0277);
+  text("Distancia: ", width-width*0.26, height-height*0.0277);
   if(iDistance<40) {
   text("        " + iDistance +" cm", width-width*0.225, height-height*0.0277);
   }
